@@ -1,6 +1,8 @@
 # TraceML
 
-**Always-on, live observability for Multi-GPU PyTorch training (DDP)**
+**Always-on, live observability for PyTorch training**
+
+Works today on **single GPU** and **single-node multi-GPU (DDP)**. Multi-node/FSDP coming.
 
 📋 **User Survey (2 min):** https://forms.gle/KwPSLaPmJnJjoVXSA
 
@@ -10,12 +12,17 @@
 [![Python 3.9-3.13](https://img.shields.io/badge/python-3.9–3.13-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](./LICENSE)
 
-TraceML is a lightweight **runtime observability** tool for **PyTorch DDP training** (currently on **single-node Multi-GPU)**.
-It surfaces **step-level, rank-aware** signals *while your job runs*, without turning on heavy profilers. It answers
+TraceML is a lightweight **runtime observability** tool for **PyTorch training** that surfaces step-level signals *while your job runs*, without turning on heavy profilers. It answers
 
-> “What’s happening inside my training step right now — and is a particular rank behaving worse than the rest?”
+> “What is happening inside my training step right now and is a particular rank behaving worse than the rest?”
 
 If your run is healthy, TraceML should say so.
+
+**Current support**
+- ✅ Single GPU
+- ✅ Single-node multi-GPU (**DDP**)
+- ❌ Multi-node DDP (not yet)
+- ❌ FSDP / TP / PP (not yet)
 
 ---
 
@@ -79,7 +86,7 @@ This helps you spot **rank imbalance / straggler-like behavior** early.
 In Deep-Dive mode, TraceML installs **model hooks** to give more context around failures:
 - Show per-layer memory and timing usage (worst across all ranks)
 - Helps identify **where** an OOM/crash happened (forward/backward region and the most suspicious layer signals)
-- Experimental and evolving — meant to be a practical debugging aid, not a formal profiler
+- Experimental and evolving,  meant to be a practical debugging aid, not a formal profiler
 
 ---
 
@@ -89,7 +96,8 @@ TraceML is **not** a profiler replacement or an auto-tuner.
 
 - It does not replace Nsight / PyTorch Profiler
 - It does not automatically fix batch size or optimizer settings
-- It will not always “find a problem”
+- It will not always find a problem.
+- It’s not limited to post-hoc analysis, it’s designed to stay on during real runs (single GPU + single-node DDP today)
 
 ---
 
@@ -97,8 +105,8 @@ TraceML is **not** a profiler replacement or an auto-tuner.
 
 TraceML currently supports:
 
-- 🖥️ **Terminal dashboard** — live updates in your console (Rich UI)
-- 🌐 **Web dashboard** — local browser UI at `http://localhost:8765`
+- 🖥️ **Terminal dashboard** live updates in your console (Rich UI)
+- 🌐 **Web dashboard** local browser UI at `http://localhost:8765`
 
 > Notebook view is temporarily disabled.
 
@@ -183,7 +191,8 @@ pip install -e ".[dev,hf,lightning]"
 
 **Requirements:** Python 3.9–3.13, PyTorch 1.12+
 **Platform:** macOS (Intel/ARM), Linux
-**Training support:** Single GPU + **single-node DDP (alpha)** + **PyTorch Lightning** + **Hugging Face Accelerate**
+**Training support (today):** Single GPU, single-node multi-GPU (**DDP**) 
+**Not yet:** Multi-node DDP, FSDP, Accelerate, Lightning (planned)
 
 ---
 
@@ -261,7 +270,7 @@ This automatically wraps each training step with `trace_step()`, capturing all s
 ## Running TraceML
 
 ```bash
-traceml run train.py --nproc-per-node=2
+traceml run train.py
 ```
 
 You’ll see a live terminal dashboard showing:
@@ -274,7 +283,7 @@ You’ll see a live terminal dashboard showing:
 ## Web Dashboard
 
 ```bash
-traceml run train.py --nproc-per-node=2 --mode=dashboard
+traceml run train.py --mode=dashboard
 ```
 
 Opens `http://localhost:8765` with interactive charts and live updates.
