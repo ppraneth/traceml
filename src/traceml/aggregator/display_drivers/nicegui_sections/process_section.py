@@ -92,7 +92,7 @@ def build_process_section():
                 "text-xs text-gray-500 mr-1"
             )
 
-        graph = _build_graph()
+        graph, fig = _build_graph()
 
         with ui.grid(columns=3).classes("w-full gap-1 mt-1"):
             _, cpu_v, _ = _tile("CPU (now/p50/p95)")
@@ -107,12 +107,35 @@ def build_process_section():
         "ram_v": ram_v,
         "gmem_v": gmem_v,
         "imb_v": imb_v,
+        "_last_ok_data": None,
+        "_last_ok_window": None,
+        "_fig": fig
     }
 
 
 def _build_graph():
-    """Create an empty RAM/GPU memory graph."""
     fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=[],
+            y=[],
+            mode="lines",
+            yaxis="y",
+            line=dict(color="#4caf50"),  # RAM green
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=[],
+            y=[],
+            mode="lines",
+            yaxis="y2",
+            line=dict(color="#ff9800"),  # GPU orange
+        )
+    )
+
     fig.update_layout(
         height=150,
         margin=dict(l=10, r=10, t=2, b=24),
@@ -133,7 +156,9 @@ def _build_graph():
             tickfont=dict(color="#ff9800"),
         ),
     )
-    return ui.plotly(fig).classes("w-full")
+
+    plot = ui.plotly(fig).classes("w-full")
+    return plot, fig
 
 
 def _tile(title):
@@ -145,97 +170,102 @@ def _tile(title):
 
 
 def update_process_section(panel, data, window_n=100):
-    """
-    Update Process Metrics dashboard.
+    try:
+        if data and (data.get("history") or []):
+            history = data["history"]
+            window = history[-window_n:]
+            if window:
+                panel["_last_ok_data"] = data
+                panel["_last_ok_window"] = window
+        else:
+            # fallback to last good (prevents flicker)
+            data = panel.get("_last_ok_data") or {}
+            window = panel.get("_last_ok_window") or []
 
-    Parameters
-    ----------
-    panel : dict
-        UI handles returned by build_process_section
-    data : dict
-        Output of ProcessRenderer.get_dashboard_renderable()
-    window_n : int
-        Rolling window size
-    """
-    if not data:
-        panel["window_text"].content = "window: –"
+        if not window:
+            panel["window_text"].content = "window: –"
+            return
+
+        panel["window_text"].content = f"window: last {len(window)} samples"
+        roll = _compute_rollups(window)
+        _update_tiles(panel, roll, data)
+        _update_graph(panel, window)
+
+    except Exception:
+        # never crash/freeze the update loop
+        try:
+            data = panel.get("_last_ok_data") or {}
+            window = panel.get("_last_ok_window") or []
+            if window:
+                roll = _compute_rollups(window)
+                _update_tiles(panel, roll, data)
+                _update_graph(panel, window)
+        except Exception:
+            pass
         return
-
-    history = data.get("history", [])
-    if not history:
-        panel["window_text"].content = "window: –"
-        return
-
-    window = history[-window_n:]
-    panel["window_text"].content = f"window: last {len(window)} samples"
-
-    roll = _compute_rollups(window)
-    _update_tiles(panel, roll, data)
-    _update_graph(panel, window)
 
 
 def _update_tiles(panel, roll, snap):
     cpu = roll["cpu"]
     panel["cpu_v"].content = (
-        f"<b>{cpu['now']:.0f}%</b> / {cpu['p50']:.0f}% / {cpu['p95']:.0f}%"
+        f"{cpu['now']:.0f}%/ {cpu['p50']:.0f}% / {cpu['p95']:.0f}%"
     )
     ram = roll["ram"]
     panel["ram_v"].content = (
-        f"<b>{fmt_mem_new(ram['now'])}</b>/"
+        f"{fmt_mem_new(ram['now'])}/"
         f"{fmt_mem_new(ram['p95'])}/"
         f"{fmt_mem_new(ram['total'])}"
     )
     if roll["gpu_available"]:
         g = roll["gpu"]
         panel["gmem_v"].content = (
-            f"<b>{fmt_mem_new(g['now'])}</b>/" f"{fmt_mem_new(g['p95'])}"
+            f"{fmt_mem_new(g['now'])}/" f"{fmt_mem_new(g['p95'])}"
         )
     else:
         panel["gmem_v"].content = "Not available"
 
     panel["imb_v"].content = (
-        fmt_mem_new(snap["gpu_used_imbalance"])
+        fmt_mem_new(snap.get("gpu_used_imbalance"))
         if snap.get("gpu_used_imbalance") is not None
         else "–"
     )
 
 
 def _update_graph(panel, window):
+    window = [
+        r for r in window
+        if isinstance(r, dict)
+        and r.get("ram_total") is not None
+        and r.get("ram_used_max") is not None
+    ]
+    if not window:
+        return
+
+    fig = panel["_fig"]
+
     x = list(range(len(window)))
 
     ram_total = max(window[-1]["ram_total"], 1.0)
     ram_pct = [(r["ram_used_max"] / ram_total) * 100.0 for r in window]
 
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=x,
-            y=ram_pct,
-            mode="lines",
-            yaxis="y",
-            line=dict(color="#4caf50"),
-        )
-    )
+    # Update RAM trace (trace 0)
+    fig.data[0].x = x
+    fig.data[0].y = ram_pct
 
+    # Update GPU trace (trace 1)
     if window[-1].get("gpu_used") is not None:
-        gpu_total = max(window[-1]["gpu_total"], 1.0)
+        gpu_total = max(window[-1].get("gpu_total", 1.0), 1.0)
         gpu_pct = [
             (r["gpu_used"] / gpu_total) * 100.0
             for r in window
             if r.get("gpu_used") is not None
         ]
+        fig.data[1].x = list(range(len(gpu_pct)))
+        fig.data[1].y = gpu_pct
+    else:
+        fig.data[1].x = []
+        fig.data[1].y = []
 
-        fig.add_trace(
-            go.Scatter(
-                x=list(range(len(gpu_pct))),
-                y=gpu_pct,
-                mode="lines",
-                yaxis="y2",
-                line=dict(color="#ff9800"),
-            )
-        )
-
-    fig.update_layout(panel["graph"].figure.layout)
     panel["graph"].update_figure(fig)
 
 
