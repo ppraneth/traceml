@@ -155,7 +155,6 @@ trainer = TraceMLTrainer(
     eval_dataset=eval_ds,
     traceml_enabled=True,
 )
-)
 ```
 
 ---

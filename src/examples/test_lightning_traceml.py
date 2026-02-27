@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 from traceml.decorators import trace_model_instance
+from traceml.utils.lightning import TraceMLCallback
 
 
 class MNISTCNN(nn.Module):
@@ -89,8 +90,6 @@ def main():
     )
 
     model = TraceLightningModule()
-
-    from traceml.utils.lightning import TraceMLCallback
 
     # Lightning Trainer execution context
     trainer = L.Trainer(
