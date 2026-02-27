@@ -220,7 +220,7 @@ def main():
         # trace_execution=False,
     )
 
-    # Optimizer sees only trainable params (LoRA) because base weights are frozen
+    # Optimizer sees only trainable params (LoRA) because base.py weights are frozen
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=LR,
