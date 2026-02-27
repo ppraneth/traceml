@@ -48,14 +48,6 @@ patch_forward()
 patch_backward()
 
 
-try:
-    from traceml.utils.lightning_patch import patch_lightning
-
-    patch_lightning()
-except Exception:
-    pass
-
-
 class TraceState:
     step = 0
 

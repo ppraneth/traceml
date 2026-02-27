@@ -90,12 +90,15 @@ def main():
 
     model = TraceLightningModule()
 
+    from traceml.utils.lightning import TraceMLCallback
+
     # Lightning Trainer execution context
     trainer = L.Trainer(
         max_steps=500,
         accelerator="auto",
         devices=1,
         enable_progress_bar=False,
+        callbacks=[TraceMLCallback()],
     )
 
     print("\nStarting Lightning Auto-Instrumented Training...")

@@ -58,7 +58,7 @@ for batch in dataloader:
 Run with cli:
 
 ``` bash
-traceml run train.py 
+traceml run train.py
 ```
 
 The terminal dashboard opens alongside your logs.
@@ -132,7 +132,7 @@ training runs.
 -   Single GPU
 -   Single-node DDP
 
-**Known limitations**: With gradient accumulation enabled, 
+**Known limitations**: With gradient accumulation enabled,
 step-level metrics may be unreliable (micro-step vs optimizer-step). Fix in progress.
 
 ---
@@ -153,8 +153,37 @@ trainer = TraceMLTrainer(
     args=training_args,
     train_dataset=train_ds,
     eval_dataset=eval_ds,
-    traceml_enabled=True,         
+    traceml_enabled=True,
 )
+)
+```
+
+---
+
+## PyTorch Lightning Integration
+
+TraceML offers official support for PyTorch Lightning models through `TraceMLCallback`.
+
+### Usage
+
+Simply pass the callback to your `Trainer`.
+
+```python
+import lightning as L
+from traceml.utils.lightning import TraceMLCallback
+from traceml.decorators import trace_model_instance
+
+class MyLightningModule(L.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.model = ...
+        # Optional: enable deep-dive per-layer instrumentation
+        trace_model_instance(self)
+
+    def training_step(self, batch, batch_idx):
+        ...
+
+trainer = L.Trainer(callbacks=[TraceMLCallback()])
 ```
 
 ---
@@ -186,8 +215,8 @@ PyTorch versions - ESSENTIAL vs DEEP-DIVE - Single GPU vs DDP
 
 ## Community & Support
 
-Founding Engineer / Co-Founder track (Berlin/Germany): We are looking 
-for a senior systems+ML builder to help grow TraceML into a sustainable AI 
+Founding Engineer / Co-Founder track (Berlin/Germany): We are looking
+for a senior systems+ML builder to help grow TraceML into a sustainable AI
 infra product. See the GitHub Discussion https://github.com/traceopt-ai/traceml/discussions/36
 
 - 📧 Email: abhinav@traceopt.ai
