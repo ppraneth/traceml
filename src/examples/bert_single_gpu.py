@@ -25,15 +25,15 @@ from transformers import (
 from traceml.decorators import trace_model_instance, trace_step
 
 SEED = 42
-# MODEL_NAME = "bert-base-uncased"
-MODEL_NAME = "prajjwal1/bert-mini"
+MODEL_NAME = "bert-base-uncased"
+# MODEL_NAME = "prajjwal1/bert-mini"
 
 
 # Increase these to generate a LOT of profiling data
-MAX_TRAIN_EXAMPLES = 5000
+MAX_TRAIN_EXAMPLES = 10000
 MAX_VAL_EXAMPLES = 0
 BATCH_SIZE = 32
-EPOCHS = 1
+EPOCHS = 10
 LR = 2e-5
 WARMUP_RATIO = 0.06
 
@@ -64,7 +64,7 @@ def prepare_data():
         range(min(MAX_VAL_EXAMPLES, len(raw["test"])))
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_fast=False)
 
     def tok(examples):
         return tokenizer(examples["text"], truncation=True)
