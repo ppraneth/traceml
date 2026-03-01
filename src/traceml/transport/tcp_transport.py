@@ -39,6 +39,7 @@ class TCPServer:
     def start(self) -> None:
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self._sock.bind((self.cfg.host, self.cfg.port))
         self._sock.listen(self.cfg.backlog)
 
