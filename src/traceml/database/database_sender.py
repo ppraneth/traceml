@@ -78,14 +78,14 @@ class DBIncrementalSender:
 
         Payload format
         --------------
-            {
-                "rank": <int>,
-                "sampler": <str>,
-                "timestamp": <float>,
-                "tables": {
-                    table_name: [row, row, ...]  # possibly multiple rows per table
-                }
+        {
+            "rank": <int>,
+            "sampler": <str>,
+            "timestamp": <float>,
+            "tables": {
+                table_name: [row, row, ...]  # possibly multiple rows per table
             }
+        }
 
         The caller is responsible for actually transmitting the returned dict.
         """
