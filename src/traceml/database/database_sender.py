@@ -78,11 +78,9 @@ class DBIncrementalSender:
 
         Payload format
         --------------
-        ::
-
             {
-                "rank":      <int>,
-                "sampler":   <str>,
+                "rank": <int>,
+                "sampler": <str>,
                 "timestamp": <float>,
                 "tables": {
                     table_name: [row, row, ...]  # possibly multiple rows per table
