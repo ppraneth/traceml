@@ -28,7 +28,7 @@ def test_hf_trainer_integration():
     TraceML instrumentation enabled.
     """
     # Use a tiny BERT model for speed
-    model_name = "prajjwal1/bert-mini"
+    model_name = "hf-internal-testing/tiny-random-bert"
 
     # Create temp directory for outputs
     with tempfile.TemporaryDirectory() as tmp_dir:
