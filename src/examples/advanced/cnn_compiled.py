@@ -1,3 +1,5 @@
+import warnings
+
 import torch
 import torch._dynamo
 import torch.nn as nn
@@ -6,6 +8,9 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 from traceml.decorators import trace_model_instance, trace_step
+
+torch._dynamo.config.suppress_errors = True
+warnings.filterwarnings("ignore", category=UserWarning, module="torch._dynamo")
 
 # -------------------------
 # Medium CNN for MNIST
