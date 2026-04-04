@@ -1,4 +1,5 @@
 import torch
+import torch._dynamo
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -104,6 +105,17 @@ def main():
 
         if step == 500:
             break
+
+    print("\n--- torch.compile verification ---")
+    # Dynamo keeps track of how many graphs it successfully compiled
+    # If this is completely empty or 0, Compilation failed completely.
+    # High cache misses or many small compilations indicate graph breaks!
+    stats = torch._dynamo.utils.compile_times()
+    print(f"Dynamo Compile Times (Stringent checks): {stats}")
+    print(
+        "\nTip: To see exact reasons for graph breaks, run this script with:"
+    )
+    print('TORCH_LOGS="graph_breaks" python cnn_compiled.py')
 
 
 if __name__ == "__main__":
