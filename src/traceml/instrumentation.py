@@ -51,6 +51,7 @@ from traceml.utils.layer_parameter_memory import (
 )
 from traceml.utils.patches.backward_auto_timer_patch import backward_auto_timer
 from traceml.utils.patches.forward_auto_timer_patch import forward_auto_timer
+from traceml.utils.patches.h2d_auto_timer_patch import h2d_auto_timer
 from traceml.utils.step_memory import StepMemoryTracker
 from traceml.utils.timing import timed_region
 
@@ -147,7 +148,7 @@ def trace_step(model: nn.Module):
         with timed_region(
             "_traceml_internal:step_time", scope="step", use_gpu=False
         ):
-            with forward_auto_timer(), backward_auto_timer():
+            with forward_auto_timer(), backward_auto_timer(), h2d_auto_timer():
                 if _should_auto_install_optimizer_timing():
                     ensure_optimizer_timing_installed()
                 yield
