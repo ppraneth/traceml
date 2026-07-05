@@ -14,6 +14,7 @@ These are the main user-facing examples.
 |---|---|---|---|
 | `quickstart.py` | Minimal plain PyTorch loop with `traceml.init(mode="auto")`, `traceml.trace_step(...)`, and `traceml.summary(...)` | CPU / CUDA | Best first example |
 | `summary_logging_minimal.py` | Minimal tracker-friendly `traceml.summary()` output for W&B or MLflow logging | CPU / CUDA | Best summary API example |
+| `mlflow_summary_minimal.py` | Executable MLflow logging of `traceml.summary()` via `log_metrics`/`set_tags`, plus optional `log_dict` of the full report | CPU / CUDA | MLflow optional: `pip install mlflow` |
 | `manual_custom_minimal.py` | Manual TraceML instrumentation with a custom batch source and explicit wrappers | CPU / CUDA | Best starting point for `mode="manual"` |
 | `distributed/ddp_minimal.py` | Minimal single-node DDP example | CPU / CUDA | Best distributed starter |
 | `ray/torchtrainer_minimal.py` | Minimal Ray Train example with Ray Data input timing | CPU / CUDA | Uses `TraceMLTorchTrainer` |
@@ -159,6 +160,7 @@ decorator compatibility paths.
 Use:
 
 - `quickstart.py` if you have a normal PyTorch loop
+- `mlflow_summary_minimal.py` if you want to log the TraceML summary to MLflow
 - `manual_custom_minimal.py` if you use a custom input pipeline or want full explicit control
 - `distributed/ddp_minimal.py` if you want single-node distributed training
 - `integrations/huggingface_trainer_minimal.py` if you use Hugging Face `Trainer`
