@@ -80,3 +80,5 @@ class TraceMLSettings:
     html_report: bool = False
     finalize_timeout_sec: float = DEFAULT_FINALIZE_TIMEOUT_SEC
     expected_world_size: int = 1
+    export_queue_size: int = 2048
+    export_drain_timeout_sec: float = 5.0
