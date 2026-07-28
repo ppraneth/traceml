@@ -7,6 +7,8 @@ which carry the full historical notes for versions predating this file.
 
 ## [Unreleased]
 
+- Hugging Face Accelerate training loops have a documented TraceML path,
+  with a runnable example and a guide.
 - Cutting a release now also creates the GitHub Release entry, so a
   published version is never missing its release notes.
 

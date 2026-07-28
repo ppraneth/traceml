@@ -19,6 +19,7 @@ These are the main user-facing examples.
 | `ray/torchtrainer_minimal.py` | Minimal Ray Train example with Ray Data input timing | CPU / CUDA | Uses `TraceMLTorchTrainer` |
 | `ray/lightning_text_classifier.py` | Ray Train + Lightning text classifier | CPU / CUDA | Uses Ray Data, `TraceMLCallback`, and optional input/H2D demo knobs |
 | `integrations/huggingface_trainer_minimal.py` | Minimal Hugging Face `TraceMLTrainerCallback` example | CPU / CUDA | No model download required |
+| `integrations/accelerate_minimal.py` | Minimal Hugging Face Accelerate loop wrapped with `traceml.trace_step(...)` | CPU / CUDA | Requires `accelerate`; exits cleanly without it |
 | `integrations/lightning_minimal.py` | Minimal Lightning integration init + `TraceMLCallback` example | CPU / CUDA | No dataset download required |
 | `integrations/deepspeed_minimal.py` | Minimal DeepSpeed loop wrapped with `traceml.trace_step(...)` | CUDA | Requires `deepspeed`; exits cleanly without it |
 
@@ -136,6 +137,13 @@ Single-node DDP:
 traceml run examples/distributed/ddp_minimal.py --nproc-per-node=4
 ```
 
+Hugging Face Accelerate (single or multi-GPU; requires `accelerate`):
+
+```bash
+traceml run examples/integrations/accelerate_minimal.py --mode=summary
+traceml run examples/integrations/accelerate_minimal.py --mode=summary --nproc-per-node=2
+```
+
 DeepSpeed (single or multi-GPU; requires `deepspeed` + a CUDA GPU):
 
 ```bash
@@ -207,6 +215,7 @@ Use:
 - `manual_custom_minimal.py` if you use a custom input pipeline or want full explicit control
 - `distributed/ddp_minimal.py` if you want single-node distributed training
 - `integrations/huggingface_trainer_minimal.py` if you use Hugging Face `Trainer`
+- `integrations/accelerate_minimal.py` if you write your own loop with Hugging Face Accelerate
 - `integrations/lightning_minimal.py` if you use PyTorch Lightning
 - `ray/torchtrainer_minimal.py` if you use Ray Train
 - `integrations/deepspeed_minimal.py` if you use DeepSpeed
