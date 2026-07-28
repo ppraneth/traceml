@@ -220,7 +220,10 @@ or on two GPUs:
 traceml run examples/integrations/accelerate_minimal.py --mode=summary --nproc-per-node=2
 ```
 
-The example exits cleanly when Accelerate is not installed.
+When Accelerate is not installed the script prints an install hint and exits
+without training, so it never raises a traceback. Run it with plain `python` in
+that case: `traceml run --mode=summary` reports a run that produced no steps as
+a failure.
 
 ## Next Steps
 
