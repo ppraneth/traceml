@@ -52,7 +52,7 @@ def main() -> None:
         print(
             "This example requires Hugging Face Accelerate. Install it "
             "with:\n"
-            "  pip install accelerate\n"
+            '  pip install "traceml-ai[accelerate]"\n'
             "or see https://huggingface.co/docs/accelerate."
         )
         sys.exit(0)

@@ -15,11 +15,14 @@ If you use `transformers.Trainer` instead of your own loop, use
 
 ## 1. Install
 
-TraceML does not depend on Accelerate. Install it yourself:
+TraceML does not depend on Accelerate. Install Accelerate yourself:
 
 ```bash
-pip install accelerate
+pip install "traceml-ai[accelerate]"
 ```
+
+or follow the [Accelerate installation guide](https://huggingface.co/docs/accelerate/basic_tutorials/install).
+`traceml-ai[hf]` already includes Accelerate, so you do not need both.
 
 Accelerate runs on CPU or GPU, so the example below works on either.
 

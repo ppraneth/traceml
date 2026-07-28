@@ -82,6 +82,10 @@ hf = [
     "accelerate>=0.26.0",
 ]
 
+accelerate = [
+    "accelerate>=0.26.0",
+]
+
 lightning = [
     "lightning>=2.6.0",
 ]
